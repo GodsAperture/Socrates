@@ -13,7 +13,6 @@ union Number{
     NumberType type;
     double float8[2];
     int64_t fixed8[2];
-    int64_t bitmask = 0xffffffffffff0000;
 
     Number(){
         fixed8[0] = 0;
@@ -38,6 +37,280 @@ union Number{
         return input;
     }
 
+    Number operator+(Number right){
+        Number left = *this;
+        Number result;
+
+        switch(this->type){
+            case NumberType::fixed:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::fixed;
+                        result.fixed8[0] = left.fixed8[0] + right.fixed8[0];
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::fraction;
+                        result.fixed8[0] = left.fixed8[0] * right.fixed8[1] + right.fixed8[0];
+                        result.fixed8[1] = right.fixed8[1];
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::floating;
+                        result.float8[0] = ((double) left.fixed8[0]) + right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = ((double) left.fixed8[0]) + right.float8[0];
+                        result.float8[1] = right.float8[1];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            case NumberType::fraction:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::fraction;
+                        result.fixed8[0] = left.fixed8[0] + right.fixed8[0] * left.fixed8[1];
+                        result.fixed8[1] = left.fixed8[1];
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::fraction;
+                        result.fixed8[0] = left.fixed8[0] * right.fixed8[1] + left.fixed8[1] * right.fixed8[0];
+                        result.fixed8[1] = left.fixed8[1] * right.fixed8[1];
+
+                        //Determine the lowest common denominator of the fraction, if one exists.
+                        if(result.fixed8[0] % result.fixed8[1] == 0){
+                            int64_t numerator = result.fixed8[0];
+                            int64_t denominator = result.fixed8[1];
+                            int64_t remainder = 0;
+
+                            while(remainder != 0){
+                                remainder = denominator % remainder;
+
+                                numerator = denominator;
+                                denominator = remainder;
+                            }
+
+                            result.fixed8[0] = result.fixed8[0] / remainder;
+                            result.fixed8[1] = result.fixed8[1] / remainder;
+                        }
+
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::floating;
+                        result.fixed8[0] = ((double) left.fixed8[0]) / ((double) left.fixed8[1]) + right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = ((double) left.fixed8[0]) / ((double) left.fixed8[1]) + right.float8[0];
+                        result.float8[1] = right.float8[1];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            case NumberType::floating:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] + ((double) right.fixed8[0]);
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] + ((double) right.fixed8[0]) / ((double) right.fixed8[1]);
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] + right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] + right.float8[0];
+                        result.float8[1] = right.float8[1];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            case NumberType::complex:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] + ((double) right.fixed8[0]);
+                        result.float8[1] = left.float8[1];
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] + ((double) right.fixed8[0]) / ((double) right.fixed8[1]);
+                        result.float8[1] = left.float8[1];
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] + right.float8[0];
+                        result.float8[1] = left.float8[1];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] + right.float8[0];
+                        result.float8[1] = left.float8[1] + right.float8[1];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            default:
+                //Unreachable.
+                return result;
+        }
+    }
+
+    Number operator-(Number right){
+        Number left = *this;
+        Number result;
+
+        switch(this->type){
+            case NumberType::fixed:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::fixed;
+                        result.fixed8[0] = left.fixed8[0] - right.fixed8[0];
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::fraction;
+                        result.fixed8[0] = left.fixed8[0] * right.fixed8[1] - right.fixed8[0];
+                        result.fixed8[1] = right.fixed8[1];
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::floating;
+                        result.float8[0] = ((double) left.fixed8[0]) - right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = ((double) left.fixed8[0]) - right.float8[0];
+                        result.float8[1] = right.float8[1];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            case NumberType::fraction:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::fraction;
+                        result.fixed8[0] = left.fixed8[0] - right.fixed8[0] * left.fixed8[1];
+                        result.fixed8[1] = left.fixed8[1];
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::fraction;
+                        result.fixed8[0] = left.fixed8[0] * right.fixed8[1] - left.fixed8[1] * right.fixed8[0];
+                        result.fixed8[1] = left.fixed8[1] * right.fixed8[1];
+
+                        //Determine the lowest common denominator of the fraction, if one exists.
+                        if(result.fixed8[0] % result.fixed8[1] == 0){
+                            int64_t numerator = result.fixed8[0];
+                            int64_t denominator = result.fixed8[1];
+                            int64_t remainder = 0;
+
+                            while(remainder != 0){
+                                remainder = denominator % remainder;
+
+                                numerator = denominator;
+                                denominator = remainder;
+                            }
+
+                            result.fixed8[0] = result.fixed8[0] / remainder;
+                            result.fixed8[1] = result.fixed8[1] / remainder;
+                        }
+
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::floating;
+                        result.fixed8[0] = ((double) left.fixed8[0]) / ((double) left.fixed8[1]) - right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = ((double) left.fixed8[0]) / ((double) left.fixed8[1]) - right.float8[0];
+                        result.float8[1] = -right.float8[1];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            case NumberType::floating:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] - ((double) right.fixed8[0]);
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] - ((double) right.fixed8[0]) / ((double) right.fixed8[1]);
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] - right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] - right.float8[0];
+                        result.float8[1] = -right.float8[1];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            case NumberType::complex:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] - ((double) right.fixed8[0]);
+                        result.float8[1] = left.float8[1];
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] - ((double) right.fixed8[0]) / ((double) right.fixed8[1]);
+                        result.float8[1] = left.float8[1];
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] - right.float8[0];
+                        result.float8[1] = left.float8[1];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] - right.float8[0];
+                        result.float8[1] = left.float8[1] - right.float8[1];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            default:
+                //Unreachable.
+                return result;
+        }
+    }
+
+    Number operator-(){
+        switch(type){
+            case fixed:
+                this->fixed8[0] = -this->fixed8[0];
+                return *this;
+            case fraction:
+                this->fixed8[0] = -this->fixed8[0];
+                return *this;
+            case floating:
+                this->float8[0] = -this->float8[0];
+                return *this;
+            case complex:
+                this->float8[0] = -this->float8[0];
+                this->float8[1] = -this->float8[1];
+                return *this;
+            default:
+                return *this;
+        }
+    }
+
     Number operator*(Number right){
         Number left = *this;
         Number result;
@@ -50,8 +323,26 @@ union Number{
                         return result;
                     case NumberType::fraction:
                         result.type = NumberType::fraction;
-                        result.fixed8[0] = left.fixed8[0] * right.fixed8[0];
-                        result.fixed8[1] = right.fixed8[1];
+                        result.fixed8[0] = left.fixed8[0] * right.fixed8[1];
+                        result.fixed8[1] = left.fixed8[1] * right.fixed8[0];
+
+                        //Determine the lowest common denominator of the fraction, if one exists.
+                        if(result.fixed8[0] % result.fixed8[1] == 0){
+                            int64_t numerator = result.fixed8[0];
+                            int64_t denominator = result.fixed8[1];
+                            int64_t remainder = 0;
+
+                            while(remainder != 0){
+                                remainder = denominator % remainder;
+
+                                numerator = denominator;
+                                denominator = remainder;
+                            }
+
+                            result.fixed8[0] = result.fixed8[0] / remainder;
+                            result.fixed8[1] = result.fixed8[1] / remainder;
+                        }
+
                         return result;
                     case NumberType::floating:
                         result.type = NumberType::floating;
@@ -115,9 +406,198 @@ union Number{
                         result.type = NumberType::floating;
                         result.float8[0] = left.float8[0] * ((double) right.fixed8[0]);
                         return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] * ((double) right.fixed8[0]) / ((double) right.fixed8[1]);
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] * right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] * right.float8[0];
+                        result.float8[1] = left.float8[0] * right.float8[1];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
                 }
-            }
-        //Unreachable.
-        return result;
+            case NumberType::complex:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] * ((double) right.fixed8[0]);
+                        result.float8[1] = left.float8[1] * ((double) right.fixed8[0]);
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] * ((double) right.fixed8[0]) / ((double) right.fixed8[1]);
+                        result.float8[1] = left.float8[1] * ((double) right.fixed8[0]) / ((double) right.fixed8[1]);
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] * right.float8[0];
+                        result.float8[1] = left.float8[1] * right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] * right.float8[0] - left.float8[1] * right.float8[1];
+                        result.float8[1] = left.float8[0] * right.float8[1] + left.float8[1] * right.float8[0];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            default:
+                //Unreachable.
+                return result;
+        }
     }
+
+    Number operator/(Number right){
+        Number left = *this;
+        Number result;
+        switch(this->type){
+            case NumberType::fixed:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::fraction;
+                        result.fixed8[0] = left.fixed8[0];
+                        result.fixed8[1] = right.fixed8[0];
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::fraction;
+                        result.fixed8[0] = left.fixed8[0] * right.fixed8[1];
+                        result.fixed8[1] = right.fixed8[0];
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::floating;
+                        result.float8[0] = ((double) left.fixed8[0]) / right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = ((double) left.fixed8[0]) * right.float8[0] / (right.float8[0] * right.float8[0] + right.float8[1] * right.float8[1]);
+                        result.float8[1] = -((double) left.fixed8[0]) * right.float8[1] / (right.float8[0] * right.float8[0] + right.float8[1] * right.float8[1]);
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            case NumberType::fraction:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::fraction;
+                        result.fixed8[0] = left.fixed8[0];
+                        result.fixed8[1] = left.fixed8[1] * right.fixed8[1];
+
+                        //Determine the lowest common denominator of the fraction, if one exists.
+                        if(result.fixed8[0] % result.fixed8[1] == 0){
+                            int64_t numerator = result.fixed8[0];
+                            int64_t denominator = result.fixed8[1];
+                            int64_t remainder = 0;
+
+                            while(remainder != 0){
+                                remainder = denominator % remainder;
+
+                                numerator = denominator;
+                                denominator = remainder;
+                            }
+
+                            result.fixed8[0] = result.fixed8[0] / remainder;
+                            result.fixed8[1] = result.fixed8[1] / remainder;
+                        }
+
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::fraction;
+                        result.fixed8[0] = left.fixed8[0] * right.fixed8[1];
+                        result.fixed8[1] = left.fixed8[1] * right.fixed8[0];
+
+                        //Determine the lowest common denominator of the fraction, if one exists.
+                        if(result.fixed8[0] % result.fixed8[1] == 0){
+                            int64_t numerator = result.fixed8[0];
+                            int64_t denominator = result.fixed8[1];
+                            int64_t remainder = 0;
+
+                            while(remainder != 0){
+                                remainder = denominator % remainder;
+
+                                numerator = denominator;
+                                denominator = remainder;
+                            }
+
+                            result.fixed8[0] = result.fixed8[0] / remainder;
+                            result.fixed8[1] = result.fixed8[1] / remainder;
+                        }
+
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::floating;
+                        result.fixed8[0] = ((double) left.fixed8[1]) / ((double) left.fixed8[0]) * right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = ((double) left.fixed8[1]) / ((double) left.fixed8[0]) * right.float8[0];
+                        result.float8[1] = ((double) left.fixed8[1]) / ((double) left.fixed8[0]) * right.float8[0];
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            case NumberType::floating:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] / ((double) right.fixed8[0]);
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] * ((double) right.fixed8[1]) / ((double) right.fixed8[0]);
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::floating;
+                        result.float8[0] = left.float8[0] / right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] * right.float8[0] / (right.float8[0] * right.float8[0] + right.float8[1] * right.float8[1]);
+                        result.float8[1] = -left.float8[1] * right.float8[1] / (right.float8[0] * right.float8[0] + right.float8[1] * right.float8[1]);
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            case NumberType::complex:
+                switch(right.type){
+                    case NumberType::fixed:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] / ((double) right.fixed8[0]);
+                        result.float8[1] = left.float8[1] / ((double) right.fixed8[0]);
+                        return result;
+                    case NumberType::fraction:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] * ((double) right.fixed8[1]) / ((double) right.fixed8[0]);
+                        result.float8[1] = left.float8[1] * ((double) right.fixed8[1]) / ((double) right.fixed8[0]);
+                        return result;
+                    case NumberType::floating:
+                        result.type = NumberType::complex;
+                        result.float8[0] = left.float8[0] / right.float8[0];
+                        result.float8[1] = left.float8[1] / right.float8[0];
+                        return result;
+                    case NumberType::complex:
+                        result.type = NumberType::complex;
+                        result.float8[0] = (left.float8[0] * right.float8[0] + left.float8[1] * right.float8[1]) / (right.float8[0] * right.float8[0] + right.float8[1] * right.float8[1]);
+                        result.float8[1] = (right.float8[0] * left.float8[1] - right.float8[1] * left.float8[0]) / (right.float8[0] * right.float8[0] + right.float8[1] * right.float8[1]);
+                        return result;
+                    default:
+                        //Unreachable.
+                        return result;
+                }
+            default:
+                //Unreachable.
+                return result;
+        }
+    }
+
 };
