@@ -1,4 +1,3 @@
-#ifndef NODE_h__
 #include <iostream>
 #include "Node.hpp"
 
@@ -64,6 +63,22 @@ void Subtract::print(){
 
 Number Subtract::evaluate(){
     return left->evaluate() - right->evaluate();
+}
+
+
+
+QuietMultiply::QuietMultiply(){
+    //Do nothing
+}
+
+void QuietMultiply::print(){
+    left->print();
+    std::cout << " ";
+    right->print();
+}
+
+Number QuietMultiply::evaluate(){
+    return left->evaluate() * right->evaluate();
 }
 
 
@@ -159,4 +174,3 @@ void Variable::print(){
 Number Variable::evaluate(){
     return value;
 }
-#endif

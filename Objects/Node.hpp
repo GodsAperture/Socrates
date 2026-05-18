@@ -1,5 +1,8 @@
+#ifndef NODE_h__
 #include <string>
 #include "Types.cpp"
+
+class Variable;
 
 class Node{
 public:
@@ -8,6 +11,7 @@ public:
     Node();
     void virtual print() = 0;
     Number virtual evaluate() = 0;
+    //Node* derivative(Variable* input) = 0;
 };
 
 class Primitive : public Node{
@@ -35,6 +39,16 @@ public:
     Node* right = nullptr;
 
     Subtract();
+    void print();
+    Number evaluate();
+};
+
+class QuietMultiply : public Node{
+public:
+    Node* left = nullptr;
+    Node* right = nullptr;
+
+    QuietMultiply();
     void print();
     Number evaluate();
 };
@@ -97,3 +111,5 @@ public:
     void print();
     Number evaluate();
 };
+
+#endif

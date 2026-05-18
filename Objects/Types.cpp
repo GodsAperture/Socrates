@@ -95,6 +95,12 @@ union Number{
                             result.fixed8[1] = result.fixed8[1] / remainder;
                         }
 
+                        //If the denominator is 1, then it's no longer a fraction.
+                        if(result.fixed8[1] == 1){
+                            result.type = NumberType::fixed;
+                            result.fixed8[1] = 0;
+                        }
+
                         return result;
                     case NumberType::floating:
                         result.type = NumberType::floating;
@@ -222,6 +228,12 @@ union Number{
                             result.fixed8[1] = result.fixed8[1] / remainder;
                         }
 
+                        //If the denominator is 1, then it's no longer a fraction.
+                        if(result.fixed8[1] == 1){
+                            result.type = NumberType::fixed;
+                            result.fixed8[1] = 0;
+                        }
+
                         return result;
                     case NumberType::floating:
                         result.type = NumberType::floating;
@@ -343,6 +355,12 @@ union Number{
                             result.fixed8[1] = result.fixed8[1] / remainder;
                         }
 
+                        //If the denominator is 1, then it's no longer a fraction.
+                        if(result.fixed8[1] == 1){
+                            result.type = NumberType::fixed;
+                            result.fixed8[1] = 0;
+                        }
+
                         return result;
                     case NumberType::floating:
                         result.type = NumberType::floating;
@@ -384,6 +402,12 @@ union Number{
 
                             result.fixed8[0] = result.fixed8[0] / remainder;
                             result.fixed8[1] = result.fixed8[1] / remainder;
+                        }
+
+                        //If the denominator is 1, then it's no longer a fraction.
+                        if(result.fixed8[1] == 1){
+                            result.type = NumberType::fixed;
+                            result.fixed8[1] = 0;
                         }
 
                         return result;
@@ -470,6 +494,30 @@ union Number{
                         result.type = NumberType::fraction;
                         result.fixed8[0] = left.fixed8[0] * right.fixed8[1];
                         result.fixed8[1] = right.fixed8[0];
+
+                        //Determine the lowest common denominator of the fraction, if one exists.
+                        if(result.fixed8[0] % result.fixed8[1] == 0){
+                            int64_t numerator = result.fixed8[0];
+                            int64_t denominator = result.fixed8[1];
+                            int64_t remainder = 0;
+
+                            while(remainder != 0){
+                                remainder = denominator % remainder;
+
+                                numerator = denominator;
+                                denominator = remainder;
+                            }
+
+                            result.fixed8[0] = result.fixed8[0] / remainder;
+                            result.fixed8[1] = result.fixed8[1] / remainder;
+                        }
+
+                        //If the denominator is 1, then it's no longer a fraction.
+                        if(result.fixed8[1] == 1){
+                            result.type = NumberType::fixed;
+                            result.fixed8[1] = 0;
+                        }
+
                         return result;
                     case NumberType::floating:
                         result.type = NumberType::floating;
@@ -508,6 +556,12 @@ union Number{
                             result.fixed8[1] = result.fixed8[1] / remainder;
                         }
 
+                        //If the denominator is 1, then it's no longer a fraction.
+                        if(result.fixed8[1] == 1){
+                            result.type = NumberType::fixed;
+                            result.fixed8[1] = 0;
+                        }
+
                         return result;
                     case NumberType::fraction:
                         result.type = NumberType::fraction;
@@ -529,6 +583,12 @@ union Number{
 
                             result.fixed8[0] = result.fixed8[0] / remainder;
                             result.fixed8[1] = result.fixed8[1] / remainder;
+                        }
+
+                        //If the denominator is 1, then it's no longer a fraction.
+                        if(result.fixed8[1] == 1){
+                            result.type = NumberType::fixed;
+                            result.fixed8[1] = 0;
                         }
 
                         return result;
