@@ -1,6 +1,10 @@
 #include <iostream>
 #include "Node.hpp"
 
+Node::Node(){
+    //Do nothing
+}
+
 Primitive::Primitive(){
     //Do nothing
 }

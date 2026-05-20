@@ -9,6 +9,17 @@ enum NumberType : uint8_t{
     constant
 };
 
+/// @brief For using identifying types by the lexer.
+enum LiteralType : uint8_t{
+    LITERALNULLTYPE,
+    Fixed,
+    Floating,
+    Complex,
+    Variable,
+    Operator,
+    Constant
+};
+
 union Number{
     NumberType type;
     double float8[2];
