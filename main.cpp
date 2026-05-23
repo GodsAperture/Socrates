@@ -13,7 +13,8 @@ int main(){
     Parser EulerParser = Parser(tokenStream);
     EulerParser.parse();
 
-    std::cout << EulerParser.AST->evaluate().fixed8[0] << "\n";
+    EulerParser.AST->evaluate().print();
+    std::cout << "\n";
 
     return 0;
 }

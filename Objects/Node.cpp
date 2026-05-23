@@ -12,28 +12,28 @@ Primitive::Primitive(){
 void Primitive::print(){
     switch(type){
         case NumberType::fixed:
-            std::cout << number.fixed8[0];
+            std::cout << number.number.fixed8[0];
             return;
         case NumberType::fraction:
-            std::cout << number.fixed8[0] << "/" << number.fixed8[1];
+            std::cout << number.number.fixed8[0] << "/" << number.number.fixed8[1];
             return;
         case NumberType::floating:
-            std::cout << number.float8[0];
+            std::cout << number.number.float8[0];
             return;
         case NumberType::complex:
-            std::cout << number.float8[0];
-            if(number.float8[1] < 0){
-                std::cout << " - " << -number.float8[1] << "i";
+            std::cout << number.number.float8[0];
+            if(number.number.float8[1] < 0){
+                std::cout << " - " << -number.number.float8[1] << "i";
             } else {
-                std::cout << " + " << number.float8[1] << "i";
+                std::cout << " + " << number.number.float8[1] << "i";
             }
             return;
         case NumberType::constant:
-            if(number.float8[0] == 3.1415926535897932){
+            if(number.number.float8[0] == 3.1415926535897932){
                 std::cout << "pi";
                 return;
             }
-            if(number.float8[0] == 2.7182818284590452){
+            if(number.number.float8[0] == 2.7182818284590452){
                 std::cout << "e";
                 return;
             }
