@@ -2,6 +2,7 @@
 #define TYPES_c__
 #include <cstdint>
 #include <math.h>
+#include <iostream>
 
 enum NumberType : uint8_t{
     fixed,
@@ -63,6 +64,7 @@ union Number{
                     case NumberType::fixed:
                         result.type = NumberType::fixed;
                         result.fixed8[0] = left.fixed8[0] + right.fixed8[0];
+                        std::cout << "Here!\n";
                         return result;
                     case NumberType::fraction:
                         result.type = NumberType::fraction;
@@ -841,6 +843,41 @@ union Number{
         }
 
         return result;
+    }
+
+    void print(){
+            switch(type){
+        case NumberType::fixed:
+            std::cout << fixed8[0];
+            return;
+        case NumberType::fraction:
+            std::cout << fixed8[0] << "/" << fixed8[1];
+            return;
+        case NumberType::floating:
+            std::cout << float8[0];
+            return;
+        case NumberType::complex:
+            std::cout << float8[0];
+            if(float8[1] < 0){
+                std::cout << " - " << -float8[1] << "i";
+            } else {
+                std::cout << " + " << float8[1] << "i";
+            }
+            return;
+        case NumberType::constant:
+            if(float8[0] == 3.1415926535897932){
+                std::cout << "pi";
+                return;
+            }
+            if(float8[0] == 2.7182818284590452){
+                std::cout << "e";
+                return;
+            }
+            std::cout << "i";
+            return;
+        default:
+            return;
+    }
     }
 };
 #endif

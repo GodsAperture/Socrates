@@ -98,18 +98,15 @@ Node* Parser::PMultiply(){
     }
 
     if(!check("*")){
-        return left;
-    } else {
         right = PMultiply();
         if(right != nullptr){
             QuietMultiply* newResult = stack->allocate<QuietMultiply>();
             newResult->left = left;
             newResult->right = right;
 
-            return result;
+            return newResult;
         } else {
-            std::cout << "Error, bad syntax.\nFailed to parse after:\n\t";
-            left->print();
+            return left;
         }
     }
 
@@ -280,12 +277,9 @@ Node* Parser::PPrimitive(){
     }
 
     Node* newResult = PParentheses();
-    if(result != nullptr){
+    if(newResult != nullptr){
         return newResult;
     }
-
-    std::cout << "Error, bad syntax.\nFailed to parse after:\n\t";
-    ((Node*) stack->current)->print();
 
     return nullptr;
 }
@@ -299,8 +293,7 @@ Node* Parser::PParentheses(){
 
     subexpression = PAdd();
     if(subexpression == nullptr){
-        std::cout << "Error, bad syntax.\nFailed to parse after:\n\t";
-        ((Node*) stack->current)->print();
+        std::cout << "Error, bad parentheses subexpression.\n";
         return nullptr;
     }
 

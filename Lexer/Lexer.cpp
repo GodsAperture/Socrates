@@ -82,6 +82,7 @@ Token Lexer::next(){
         }
 
         result.name = std::string_view(theText.data() + start, pointer - start);
+        return result;
     }
 
     //Check for variables and special constants.
@@ -104,7 +105,7 @@ Token Lexer::next(){
             result.type = LiteralType::Constant;
         }
         if(result.name == "i"){
-            result.type = LiteralType::Complex;
+            result.type = LiteralType::Constant;
         }
 
         return result;

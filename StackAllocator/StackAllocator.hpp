@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <iostream>
 
 class StackAllocator{
 public:
@@ -16,7 +17,7 @@ public:
     template<typename T>
     T* allocate(){
         int64_t memorySize = sizeof(T);
-        memorySize = 7L & (8 - (7L & memorySize));
+        memorySize = memorySize + (7L & (8 - (7L & memorySize)));
         T* result = new (current) T();
 
         current = (void*) (((char*) current) + memorySize);
