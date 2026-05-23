@@ -1,4 +1,5 @@
 #ifndef LEXER_h__
+#define LEXER_h__
 
 #include <string>
 #include <vector>

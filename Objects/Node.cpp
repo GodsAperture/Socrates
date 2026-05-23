@@ -167,6 +167,24 @@ Number Negative::evaluate(){
 
 
 
+Factorial::Factorial(){
+    //Do nothing
+}
+
+void Factorial::print(){
+    left->print();
+    std::cout << "!";
+}
+
+Number Factorial::evaluate(){
+    Number result;
+    //TO DO
+    //The mathematical definition of factorial is very problematic.
+    return result;
+}
+
+
+
 Variable::Variable(){
     //Do nothing
 }

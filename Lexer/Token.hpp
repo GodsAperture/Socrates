@@ -1,4 +1,5 @@
 #ifndef TOKEN_h__
+#define TOKEN_h__
 #include <string>
 #include "../Objects/Types.cpp"
 

@@ -1,4 +1,6 @@
 #ifndef NODE_h__
+#define NODE_h__
+
 #include <string>
 #include "Types.cpp"
 
@@ -6,7 +8,7 @@ class Variable;
 
 class Node{
 public:
-    NumberType type = NumberType::NULLTYPE;
+    NumberType type = NumberType::fixed;
 
     Node();
     void virtual print() = 0;
@@ -97,6 +99,15 @@ public:
     Node* subexpression = nullptr;
 
     Negative();
+    void print();
+    Number evaluate();
+};
+
+class Factorial : public Node{
+public:
+    Node* left = nullptr;
+
+    Factorial();
     void print();
     Number evaluate();
 };

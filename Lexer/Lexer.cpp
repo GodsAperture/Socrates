@@ -20,6 +20,18 @@ inline bool isOperator(char input){
     if(input == '^'){
         return true;
     }
+    if(input == '('){
+        return true;
+    }
+    if(input == ')'){
+        return true;
+    }
+    if(input == '['){
+        return true;
+    }
+    if(input == ']'){
+        return true;
+    }
     
     return false;
 }
@@ -99,7 +111,7 @@ Token Lexer::next(){
     }
 
     //Check for basic operators.
-    //+, -, *, /, %, ^
+    //+, -, *, /, %, ^, (, ), [, ]
     if(isOperator(currentCharacter)){
         result.type = LiteralType::Operator;
         result.name = std::string_view(theText.data() + start, 1);
