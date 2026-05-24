@@ -161,14 +161,7 @@ Node* Parser::PNegative(){
         return nullptr;
     }
 
-    right = PNegative();
-    if(right != nullptr){
-        result = stack->allocate<Negative>();
-        result->subexpression = right;
-        return result;
-    }
-
-    right = PExponent();
+    right = PMultiply();
     if(right != nullptr){
         result = stack->allocate<Negative>();
         result->subexpression = right;
@@ -229,6 +222,7 @@ Node* Parser::PFactorial(){
 
 Node* Parser::PPrimitive(){
     Primitive* result = nullptr;
+    Node* newResult = nullptr;
 
     if(given[current].type == LiteralType::Fixed){
         result = stack->allocate<Primitive>();
@@ -276,7 +270,12 @@ Node* Parser::PPrimitive(){
         return result;
     }
 
-    Node* newResult = PParentheses();
+    newResult = PParentheses();
+    if(newResult != nullptr){
+        return newResult;
+    }
+
+    newResult = PNegative();
     if(newResult != nullptr){
         return newResult;
     }
@@ -302,6 +301,31 @@ Node* Parser::PParentheses(){
     }
 
     result = stack->allocate<Parentheses>();
+    result->subexpression = subexpression;
+
+    return result;
+}
+
+Node* Parser::PAbsoluteValue(){
+    Node* subexpression = nullptr;
+    AbsoluteValue* result = nullptr;
+
+    if(!check("|")){
+        return nullptr;
+    }
+
+    subexpression = PAdd();
+    if(subexpression == nullptr){
+        //This is an error.
+        return nullptr;
+    }
+
+    if(!check("|")){
+        //This is an error.
+        return nullptr;
+    }
+
+    result = stack->allocate<AbsoluteValue>();
     result->subexpression = subexpression;
 
     return result;

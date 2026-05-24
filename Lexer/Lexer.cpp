@@ -32,6 +32,9 @@ inline bool isOperator(char input){
     if(input == ']'){
         return true;
     }
+    if(input == '|'){
+        return true;
+    }
     
     return false;
 }
@@ -70,6 +73,7 @@ Token Lexer::next(){
         if(currentCharacter == '.'){
             result.type = LiteralType::Floating;
             pointer++;
+            currentCharacter = theText[pointer];
         } else {
             result.name = std::string_view(theText.data() + start, pointer - start);
             return result;

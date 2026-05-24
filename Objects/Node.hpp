@@ -112,6 +112,15 @@ public:
     Number evaluate();
 };
 
+class AbsoluteValue : public Node{
+public:
+    Node* subexpression = nullptr;
+
+    AbsoluteValue();
+    void print();
+    Number evaluate();
+};
+
 class Variable : public Node{
 public:
     std::string name = "";

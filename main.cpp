@@ -13,6 +13,8 @@ int main(){
     Parser EulerParser = Parser(tokenStream);
     EulerParser.parse();
 
+    EulerParser.AST->print();
+    std::cout << "\n";
     EulerParser.AST->evaluate().print();
     std::cout << "\n";
 

@@ -60,13 +60,11 @@ public:
     }
 
     Number operator=(Number right){
-        Number result;
+        type = right.type;
+        number.fixed8[0] = right.number.fixed8[0];
+        number.fixed8[1] = right.number.fixed8[1];
 
-        result.type = right.type;
-        result.number.fixed8[0] = right.number.fixed8[0];
-        result.number.fixed8[1] = right.number.fixed8[1];
-
-        return result;
+        return *this;
     }
 
     Number operator+(Number right){
@@ -713,6 +711,7 @@ public:
                     //Each bit in the exponnet tells me which exponentials of the base to use.
                     case NumberType::fixed:
                         result.type = NumberType::fixed;
+                        handy = *this;
                         isNegative = right.number.fixed8[0] < 0;
 
                         if(isNegative){
@@ -721,7 +720,7 @@ public:
 
                         while(remainingExponent != 0){
                             //If the bit is 0, then I don't want to multiply the result.
-                            if(bitmask & remainingExponent == 1){
+                            if((bitmask & remainingExponent) == 1){
                                 result = result * handy;
                             }
                             handy = handy * handy;
@@ -766,7 +765,7 @@ public:
 
                         while(remainingExponent != 0){
                             //If the bit is 0, then I don't want to multiply the result.
-                            if(bitmask & remainingExponent == 1){
+                            if((bitmask & remainingExponent) == 1){
                                 result = result * handy;
                             }
 
@@ -812,7 +811,7 @@ public:
                         result.type = NumberType::floating;
                         //Edge case: The base is negative.
                         if(number.float8[0] < 0){
-                            result.type = NumberType::floating;
+                            result.type = NumberType::complex;
                             result.number.float8[0] = pow(number.float8[0], right.number.float8[0]) * cos(3.14159265358979323846 * right.number.float8[0]);
                             result.number.float8[1] = pow(number.float8[0], right.number.float8[0]) * sin(3.14159265358979323846 * right.number.float8[0]);
                             return result;
@@ -821,8 +820,8 @@ public:
                         return result;
                     case NumberType::complex:
                         result.type = NumberType::complex;
-                        result.number.float8[0] = exp(log(number.float8[0]) * right.number.fixed8[0]) * cos(log(number.float8[0]) * right.number.fixed8[1]);
-                        result.number.float8[1] = exp(log(number.float8[0]) * right.number.fixed8[0]) * sin(log(number.float8[0]) * right.number.fixed8[1]);
+                        result.number.float8[0] = exp(log(number.float8[0]) * right.number.float8[0]) * cos(log(number.float8[0]) * right.number.float8[1]);
+                        result.number.float8[1] = exp(log(number.float8[0]) * right.number.float8[0]) * sin(log(number.float8[0]) * right.number.float8[1]);
                         return result;
                     default:
                         //Unreachable

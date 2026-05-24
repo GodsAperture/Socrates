@@ -140,9 +140,8 @@ void Exponent::print(){
     right->print();
 }
 
-//Placeholder. FIX THIS!
 Number Exponent::evaluate(){
-    return right->evaluate();
+    return left->evaluate() ^ right->evaluate();
 }
 
 
@@ -192,6 +191,49 @@ Number Factorial::evaluate(){
     //TO DO
     //The mathematical definition of factorial is very problematic.
     return result;
+}
+
+
+
+AbsoluteValue::AbsoluteValue(){
+    //Do nothing
+}
+
+void AbsoluteValue::print(){
+    std::cout << "|";
+    subexpression->print();
+    std::cout << "|";
+}
+
+Number AbsoluteValue::evaluate(){
+    Number result = subexpression->evaluate();
+
+    switch(type){
+        case NumberType::fixed:
+            if(result.number.fixed8[0] < 0){
+                return -result;
+            } else {
+                return result;
+            }
+        case NumberType::fraction:
+            if(result.number.fixed8[0] < 0){
+                result.number.fixed8[0] = -result.number.fixed8[0];
+            }
+            if(result.number.fixed8[1] < 0){
+                result.number.fixed8[1] = -result.number.fixed8[1];
+            }
+            return result;
+        case NumberType::floating:
+            if(result.number.float8[0] < 0){
+                return -result;
+            }
+        case NumberType::complex:
+            result.type = NumberType::floating;
+            result.number.float8[0] = sqrt(result.number.float8[0] * result.number.float8[0] + result.number.float8[1] * result.number.float8[1]);
+            return result;
+        default:
+            return result;
+    }
 }
 
 

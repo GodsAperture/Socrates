@@ -28,6 +28,7 @@ public:
     Node* PFactorial();
     Node* PPrimitive();
     Node* PParentheses();
+    Node* PAbsoluteValue();
 
 };
 #endif
