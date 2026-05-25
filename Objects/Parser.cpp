@@ -98,16 +98,7 @@ Node* Parser::PMultiply(){
     }
 
     if(!check("*")){
-        right = PMultiply();
-        if(right != nullptr){
-            QuietMultiply* newResult = stack->allocate<QuietMultiply>();
-            newResult->left = left;
-            newResult->right = right;
-
-            return newResult;
-        } else {
-            return left;
-        }
+        return left;
     }
 
     right = PMultiply();
@@ -275,6 +266,11 @@ Node* Parser::PPrimitive(){
         return newResult;
     }
 
+    newResult = PAbsoluteValue();
+    if(newResult != nullptr){
+        return newResult;
+    }
+
     newResult = PNegative();
     if(newResult != nullptr){
         return newResult;
@@ -316,11 +312,15 @@ Node* Parser::PAbsoluteValue(){
 
     subexpression = PAdd();
     if(subexpression == nullptr){
-        //This is an error.
+        //This exists because the second | in  the expression |4 - 5| will
+        //trigger a second pass for absolute value and make parsing fail.
+        //This will make the second check fail and let the second | be found in the first check.
+        current--;
         return nullptr;
     }
 
     if(!check("|")){
+        current--;
         //This is an error.
         return nullptr;
     }

@@ -82,22 +82,6 @@ Number Subtract::evaluate(){
 
 
 
-QuietMultiply::QuietMultiply(){
-    //Do nothing
-}
-
-void QuietMultiply::print(){
-    left->print();
-    std::cout << " ";
-    right->print();
-}
-
-Number QuietMultiply::evaluate(){
-    return left->evaluate() * right->evaluate();
-}
-
-
-
 Multiply::Multiply(){
     //Do nothing
 }

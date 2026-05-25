@@ -45,16 +45,6 @@ public:
     Number evaluate();
 };
 
-class QuietMultiply : public Node{
-public:
-    Node* left = nullptr;
-    Node* right = nullptr;
-
-    QuietMultiply();
-    void print();
-    Number evaluate();
-};
-
 class Multiply : public Node{
 public:
     Node* left = nullptr;

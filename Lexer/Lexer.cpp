@@ -116,7 +116,7 @@ Token Lexer::next(){
     }
 
     //Check for basic operators.
-    //+, -, *, /, %, ^, (, ), [, ]
+    //+, -, *, /, %, ^, (, ), [, ], |
     if(isOperator(currentCharacter)){
         result.type = LiteralType::Operator;
         result.name = std::string_view(theText.data() + start, 1);
