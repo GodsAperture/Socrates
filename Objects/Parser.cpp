@@ -26,7 +26,7 @@ inline bool Parser::check(std::string input){
 
     return false;
 }
-
+    
 Node* Parser::PAdd(){
     Node* left = nullptr;
     Node* right = nullptr;
@@ -62,7 +62,7 @@ Node* Parser::PSubtract(){
     Node* right = nullptr;
     Subtract* result = nullptr;
 
-    left = PMultiply();
+    left = PImaginary();
     if(left == nullptr){
         return nullptr;
     }
@@ -85,6 +85,28 @@ Node* Parser::PSubtract(){
 
     return result;
 
+}
+
+Node* Parser::PImaginary(){
+    Node* coefficient = nullptr;
+    Imaginary* result = nullptr;
+    Primitive* rightHandSide = nullptr;
+
+    coefficient = PMultiply();
+    if(coefficient == nullptr){
+        return nullptr;
+    }
+
+    if(!check("i")){
+        return coefficient;
+    }
+
+    //Generate a product between the imaginary unit and the primitive.
+    result = stack->allocate<Imaginary>();
+    result->type = NumberType::complex;
+    result->coefficient = coefficient;
+
+    return result;
 }
 
 Node* Parser::PMultiply(){
@@ -192,33 +214,11 @@ Node* Parser::PExponent(){
 
 }
 
-Node* Parser::PImaginary(){
-    Node* coefficient = nullptr;
-    Imaginary* result = nullptr;
-    Primitive* rightHandSide = nullptr;
-
-    coefficient = PPrimitive();
-    if(coefficient == nullptr){
-        return nullptr;
-    }
-
-    if(!check("i")){
-        return coefficient;
-    }
-
-    //Generate a product between the imaginary unit and the primitive.
-    result = stack->allocate<Imaginary>();
-    result->type = NumberType::complex;
-    result->coefficient = coefficient;
-
-    return result;
-}
-
 Node* Parser::PFactorial(){
     Node* left = nullptr;
     Factorial* result = nullptr;
 
-    left = PImaginary();
+    left = PPrimitive();
     if(left == nullptr){
         return nullptr;
     }

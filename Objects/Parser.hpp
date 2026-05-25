@@ -21,12 +21,12 @@ public:
     void print();
     Node* PAdd();
     Node* PSubtract();
+    Node* PImaginary();
     Node* PMultiply();
     Node* PDivide();
     Node* PNegative();
     Node* PExponent();
     Node* PFactorial();
-    Node* PImaginary();
     Node* PPrimitive();
     Node* PParentheses();
     Node* PAbsoluteValue();
