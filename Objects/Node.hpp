@@ -25,6 +25,15 @@ public:
     Number evaluate();
 };
 
+class Imaginary : public Node{
+public:
+    Node* coefficient = nullptr;
+
+    Imaginary();
+    void print();
+    Number evaluate();
+};
+
 class Add : public Node{
 public:
     Node* left = nullptr;

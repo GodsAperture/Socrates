@@ -26,6 +26,7 @@ public:
     Node* PNegative();
     Node* PExponent();
     Node* PFactorial();
+    Node* PImaginary();
     Node* PPrimitive();
     Node* PParentheses();
     Node* PAbsoluteValue();

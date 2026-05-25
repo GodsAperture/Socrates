@@ -192,11 +192,33 @@ Node* Parser::PExponent(){
 
 }
 
+Node* Parser::PImaginary(){
+    Node* coefficient = nullptr;
+    Imaginary* result = nullptr;
+    Primitive* rightHandSide = nullptr;
+
+    coefficient = PPrimitive();
+    if(coefficient == nullptr){
+        return nullptr;
+    }
+
+    if(!check("i")){
+        return coefficient;
+    }
+
+    //Generate a product between the imaginary unit and the primitive.
+    result = stack->allocate<Imaginary>();
+    result->type = NumberType::complex;
+    result->coefficient = coefficient;
+
+    return result;
+}
+
 Node* Parser::PFactorial(){
     Node* left = nullptr;
     Factorial* result = nullptr;
 
-    left = PPrimitive();
+    left = PImaginary();
     if(left == nullptr){
         return nullptr;
     }

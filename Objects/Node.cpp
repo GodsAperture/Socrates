@@ -50,6 +50,41 @@ Number Primitive::evaluate(){
 
 
 
+Imaginary::Imaginary(){
+    //Do nothing
+}
+
+void Imaginary::print(){
+    coefficient->print();
+    std::cout << "i";
+}
+
+Number Imaginary::evaluate(){
+    Number result;
+    result.type = NumberType::complex;
+    Number evaluation = coefficient->evaluate();
+
+    switch(evaluation.type){
+        case NumberType::fixed:
+            result.number.float8[1] = ((double) evaluation.number.fixed8[0]);
+            return result;
+        case NumberType::fraction:
+            result.number.float8[1] = ((double) evaluation.number.fixed8[0]) / ((double) evaluation.number.fixed8[1]);
+            return result;
+        case NumberType::floating:
+            result.number.float8[1] = evaluation.number.float8[0];
+            return result;
+        case NumberType::complex:
+            result.number.float8[0] = -evaluation.number.float8[1];
+            result.number.float8[1] = evaluation.number.float8[0];
+            return result;
+        default:
+            return result;
+    }
+}
+
+
+
 Add::Add(){
     //Do nothing
 }
@@ -192,7 +227,7 @@ void AbsoluteValue::print(){
 Number AbsoluteValue::evaluate(){
     Number result = subexpression->evaluate();
 
-    switch(type){
+    switch(result.type){
         case NumberType::fixed:
             if(result.number.fixed8[0] < 0){
                 return -result;
@@ -214,6 +249,7 @@ Number AbsoluteValue::evaluate(){
         case NumberType::complex:
             result.type = NumberType::floating;
             result.number.float8[0] = sqrt(result.number.float8[0] * result.number.float8[0] + result.number.float8[1] * result.number.float8[1]);
+            result.number.float8[1] = 0.0;
             return result;
         default:
             return result;
