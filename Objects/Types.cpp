@@ -18,7 +18,7 @@ enum LiteralType : uint8_t{
     Fixed,
     Floating,
     Complex,
-    Variable,
+    LiteralVariable,
     Operator,
     Constant
 };

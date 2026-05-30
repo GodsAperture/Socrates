@@ -1,9 +1,8 @@
 #include <iostream>
 #include "Parser.hpp"
 
-Parser::Parser(std::vector<Token>& input){
-    given = input;
-    stack = new StackAllocator(1024);
+Parser::Parser(){
+    //Do nothing
 }
 
 
@@ -14,6 +13,12 @@ void Parser::parse(){
 
 void Parser::print(){
     AST->print();
+}
+
+void Parser::clear(){
+    AST = nullptr;
+    current = 0;
+    stack->clear();
 }
 
 
@@ -123,7 +128,7 @@ Node* Parser::PMultiply(){
         return left;
     }
 
-    right = PMultiply();
+    right = PImaginary();
     if(right == nullptr){
         return nullptr;
         std::cout << "Error, bad syntax.\n";

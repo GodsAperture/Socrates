@@ -10,7 +10,9 @@ int main(){
     Lexer EulerLexer = Lexer(userInput);
     std::vector<Token> tokenStream = EulerLexer.tokenize();
 
-    Parser EulerParser = Parser(tokenStream);
+    Parser EulerParser;
+    EulerParser.given = tokenStream;
+    EulerParser.stack = new StackAllocator(2048);
     EulerParser.parse();
 
     EulerParser.AST->print();

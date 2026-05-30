@@ -4,10 +4,10 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <cstring>
 
 class StackAllocator{
 public:
-    void* allocation = nullptr;
     void* head = nullptr;
     void* current = nullptr;
     int64_t size = 0;
@@ -24,5 +24,7 @@ public:
 
         return result;
     }
+
+    void clear();
 };
 #endif

@@ -3,17 +3,34 @@
 
 #include <string>
 #include "Types.cpp"
+#include "../StackAllocator/StackAllocator.hpp"
 
 class Variable;
+
+template<typename V1, typename V2>
+class Duo{
+public:
+    V1 first;
+    V2 second;
+
+    Duo();
+};
 
 class Node{
 public:
     NumberType type = NumberType::fixed;
 
     Node();
-    void virtual print() = 0;
-    Number virtual evaluate() = 0;
-    //Node* derivative(Variable* input) = 0;
+    //Plain prints the AST to the terminal.
+    virtual void print() = 0;
+    //Checks to see if there are only primitives in the nodes.
+    virtual bool isEnd() = 0;
+    //Performs a few evaluations to do "step by step" executions.
+    virtual Duo<bool, Node*> step(StackAllocator* stack) = 0;
+    //Prints out the AST showing what portions are to be evaluated next.
+    virtual void stepPrint() = 0;
+    virtual Number evaluate() = 0;
+    //virtual Node* derivative(Variable* input) = 0;
 };
 
 class Primitive : public Node{
@@ -22,6 +39,9 @@ public:
 
     Primitive();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -31,6 +51,9 @@ public:
 
     Imaginary();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -41,6 +64,9 @@ public:
 
     Add();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -51,6 +77,9 @@ public:
 
     Subtract();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -61,6 +90,9 @@ public:
 
     Multiply();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -71,6 +103,9 @@ public:
 
     Divide();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -81,6 +116,9 @@ public:
 
     Exponent();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -90,6 +128,9 @@ public:
 
     Parentheses();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -99,6 +140,9 @@ public:
 
     Negative();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -108,6 +152,9 @@ public:
 
     Factorial();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -117,6 +164,9 @@ public:
 
     AbsoluteValue();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 
@@ -125,9 +175,13 @@ public:
     std::string name = "";
     Number value;
     Variable* next = nullptr;
+    Variable* previous = nullptr;
 
     Variable();
     void print();
+    bool isEnd();
+    Duo<bool, Node*> step(StackAllocator* stack);
+    void stepPrint();
     Number evaluate();
 };
 

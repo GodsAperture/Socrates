@@ -5,6 +5,8 @@ Node::Node(){
     //Do nothing
 }
 
+
+
 Primitive::Primitive(){
     //Do nothing
 }
@@ -44,6 +46,21 @@ void Primitive::print(){
     }
 }
 
+bool Primitive::isEnd(){
+    return true;
+}
+
+Duo<bool, Node*> Primitive::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Primitive* node = stack->allocate<Primitive>();
+    node->number = evaluate();
+
+    result.first = true;
+    result.second = stack->allocate<Primitive>();
+
+    return result;
+}
+
 Number Primitive::evaluate(){
     return number;
 }
@@ -57,6 +74,21 @@ Imaginary::Imaginary(){
 void Imaginary::print(){
     coefficient->print();
     std::cout << "i";
+}
+
+bool Imaginary::isEnd(){
+    return true;
+}
+
+Duo<bool, Node*> Imaginary::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Primitive* node = stack->allocate<Primitive>();
+    node->number = evaluate();
+
+    result.first = true;
+    result.second = stack->allocate<Primitive>();
+
+    return result;
 }
 
 Number Imaginary::evaluate(){
@@ -95,6 +127,31 @@ void Add::print(){
     right->print();
 }
 
+bool Add::isEnd(){
+    return false;
+}
+
+Duo<bool, Node*> Add::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Duo<bool, Node*> leftEvaluation = left->step(stack);
+    Duo<bool, Node*> rightEvaluation = right->step(stack);
+    result.first = false;
+
+    //Check to see if it should be evaluated.
+    if(leftEvaluation.first & rightEvaluation.first){
+        Primitive* node = stack->allocate<Primitive>();
+        node->number = evaluate();
+        result.second = node;
+    } else {
+        Add* node = stack->allocate<Add>();
+        node->left = leftEvaluation.second;
+        node->right = rightEvaluation.second;
+        result.second = node;
+    }
+
+    return result;
+}
+
 Number Add::evaluate(){
     return left->evaluate() + right->evaluate();
 }
@@ -109,6 +166,31 @@ void Subtract::print(){
     left->print();
     std::cout << " - ";
     right->print();
+}
+
+bool Subtract::isEnd(){
+    return false;
+}
+
+Duo<bool, Node*> Subtract::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Duo<bool, Node*> leftEvaluation = left->step(stack);
+    Duo<bool, Node*> rightEvaluation = right->step(stack);
+    result.first = false;
+
+    //Check to see if it should be evaluated.
+    if(leftEvaluation.first & rightEvaluation.first){
+        Primitive* node = stack->allocate<Primitive>();
+        node->number = evaluate();
+        result.second = node;
+    } else {
+        Subtract* node = stack->allocate<Subtract>();
+        node->left = leftEvaluation.second;
+        node->right = rightEvaluation.second;
+        result.second = node;
+    }
+
+    return result;
 }
 
 Number Subtract::evaluate(){
@@ -127,6 +209,31 @@ void Multiply::print(){
     right->print();
 }
 
+bool Multiply::isEnd(){
+    return false;
+}
+
+Duo<bool, Node*> Multiply::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Duo<bool, Node*> leftEvaluation = left->step(stack);
+    Duo<bool, Node*> rightEvaluation = right->step(stack);
+    result.first = false;
+
+    //Check to see if it should be evaluated.
+    if(leftEvaluation.first & rightEvaluation.first){
+        Primitive* node = stack->allocate<Primitive>();
+        node->number = evaluate();
+        result.second = node;
+    } else {
+        Multiply* node = stack->allocate<Multiply>();
+        node->left = leftEvaluation.second;
+        node->right = rightEvaluation.second;
+        result.second = node;
+    }
+
+    return result;
+}
+
 Number Multiply::evaluate(){
     return left->evaluate() * right->evaluate();
 }
@@ -141,6 +248,31 @@ void Divide::print(){
     left->print();
     std::cout << " / ";
     right->print();
+}
+
+bool Divide::isEnd(){
+    return false;
+}
+
+Duo<bool, Node*> Divide::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Duo<bool, Node*> leftEvaluation = left->step(stack);
+    Duo<bool, Node*> rightEvaluation = right->step(stack);
+    result.first = false;
+
+    //Check to see if it should be evaluated.
+    if(leftEvaluation.first & rightEvaluation.first){
+        Primitive* node = stack->allocate<Primitive>();
+        node->number = evaluate();
+        result.second = node;
+    } else {
+        Divide* node = stack->allocate<Divide>();
+        node->left = leftEvaluation.second;
+        node->right = rightEvaluation.second;
+        result.second = node;
+    }
+
+    return result;
 }
 
 Number Divide::evaluate(){
@@ -159,6 +291,31 @@ void Exponent::print(){
     right->print();
 }
 
+bool Exponent::isEnd(){
+    return false;
+}
+
+Duo<bool, Node*> Exponent::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Duo<bool, Node*> leftEvaluation = left->step(stack);
+    Duo<bool, Node*> rightEvaluation = right->step(stack);
+    result.first = false;
+
+    //Check to see if it should be evaluated.
+    if(leftEvaluation.first & rightEvaluation.first){
+        Primitive* node = stack->allocate<Primitive>();
+        node->number = evaluate();
+        result.second = node;
+    } else {
+        Exponent* node = stack->allocate<Exponent>();
+        node->left = leftEvaluation.second;
+        node->right = rightEvaluation.second;
+        result.second = node;
+    }
+
+    return result;
+}
+
 Number Exponent::evaluate(){
     return left->evaluate() ^ right->evaluate();
 }
@@ -173,6 +330,41 @@ void Parentheses::print(){
     std::cout << "(";
     subexpression->print();
     std::cout << ")";
+}
+
+bool Parentheses::isEnd(){
+    //This is a special case.
+    //Otherwise, I'd end up with dumb shit like `>> (3) <<`.
+    return subexpression->isEnd();
+}
+
+Duo<bool, Node*> Parentheses::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Duo<bool, Node*> evaluation = subexpression->step(stack);
+    result.first = false;
+
+    //Check to see if it should be evaluated.
+    if(evaluation.first){
+        Primitive* node = stack->allocate<Primitive>();
+        node->number = evaluate();
+        result.second = node;
+    } else {
+        Parentheses* node = stack->allocate<Parentheses>();
+        node->subexpression = evaluation.second;
+        result.second = node;
+    }
+
+    return result;
+}
+
+void Parentheses::stepPrint(){
+    if(subexpression->isEnd()){
+        std::cout << ">> ";
+        subexpression->stepPrint();
+        std::cout << " <<";
+    } else {
+        left->stepPrint();
+    }
 }
 
 Number Parentheses::evaluate(){
@@ -190,6 +382,41 @@ void Negative::print(){
     subexpression->print();
 }
 
+bool Negative::isEnd(){
+    //This is a special case.
+    //Otherwise, I'd end up with dumb shit like `>> -3 <<`.
+    return subexpression->isEnd();
+}
+
+Duo<bool, Node*> Negative::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Duo<bool, Node*> evaluation = subexpression->step(stack);
+    result.first = false;
+
+    //Check to see if it should be evaluated.
+    if(evaluation.first){
+        Primitive* node = stack->allocate<Primitive>();
+        node->number = evaluate();
+        result.second = node;
+    } else {
+        Factorial* node = stack->allocate<Factorial>();
+        node->left = evaluation.second;
+        result.second = node;
+    }
+
+    return result;
+}
+
+void Factorial::stepPrint(){
+    if(left->isEnd()){
+        std::cout << ">> ";
+        left->stepPrint();
+        std::cout << " <<";
+    } else {
+        left->stepPrint();
+    }
+}
+
 Number Negative::evaluate(){
     return -subexpression->evaluate();
 }
@@ -203,6 +430,40 @@ Factorial::Factorial(){
 void Factorial::print(){
     left->print();
     std::cout << "!";
+}
+
+bool Factorial::isEnd(){
+    return false;
+}
+
+Duo<bool, Node*> Factorial::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Duo<bool, Node*> evaluation = left->step(stack);
+    result.first = false;
+
+
+    //Check to see if it should be evaluated.
+    if(evaluation.first){
+        Primitive* node = stack->allocate<Primitive>();
+        node->number = evaluate();
+        result.second = node;
+    } else {
+        Factorial* node = stack->allocate<Factorial>();
+        node->left = evaluation.second;
+        result.second = node;
+    }
+
+    return result;
+}
+
+void Factorial::stepPrint(){
+    if(left->isEnd()){
+        std::cout << ">> ";
+        left->stepPrint();
+        std::cout << " <<";
+    } else {
+        left->stepPrint();
+    }
 }
 
 Number Factorial::evaluate(){
@@ -222,6 +483,39 @@ void AbsoluteValue::print(){
     std::cout << "|";
     subexpression->print();
     std::cout << "|";
+}
+
+bool AbsoluteValue::isEnd(){
+    return false;
+}
+
+Duo<bool, Node*> AbsoluteValue::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Duo<bool, Node*> evaluation = subexpression->step(stack);
+    result.first = false;
+
+    //Check to see if it should be evaluated.
+    if(evaluation.first){
+        Primitive* node = stack->allocate<Primitive>();
+        node->number = evaluate();
+        result.second = node;
+    } else {
+        AbsoluteValue* node = stack->allocate<AbsoluteValue>();
+        node->subexpression = evaluation.second;
+        result.second = node;
+    }
+
+    return result;
+}
+
+void AbsoluteValue::stepPrint(){
+    if(subexpression->isEnd()){
+        std::cout << ">> ";
+        subexpression->stepPrint();
+        std::cout << " <<";
+    } else {
+        subexpression->stepPrint();
+    }
 }
 
 Number AbsoluteValue::evaluate(){
@@ -263,6 +557,25 @@ Variable::Variable(){
 }
 
 void Variable::print(){
+    std::cout << name;
+}
+
+bool Variable::isEnd(){
+    return true;
+}
+
+Duo<bool, Node*> Variable::step(StackAllocator* stack){
+    Duo<bool, Node*> result;
+    Primitive* node = stack->allocate<Primitive>();
+    node->number = evaluate();
+
+    result.first = true;
+    result.second = node;
+
+    return result;
+}
+
+void Variable::stepPrint(){
     std::cout << name;
 }
 

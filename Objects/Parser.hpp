@@ -14,11 +14,12 @@ public:
     StackAllocator* stack = nullptr;
     Node* AST = nullptr;
 
-    Parser(std::vector<Token>& input);
+    Parser();
     inline bool check(std::string input);
 
     void parse();
     void print();
+    void clear();
     Node* PAdd();
     Node* PSubtract();
     Node* PImaginary();
@@ -30,6 +31,5 @@ public:
     Node* PPrimitive();
     Node* PParentheses();
     Node* PAbsoluteValue();
-
 };
 #endif
