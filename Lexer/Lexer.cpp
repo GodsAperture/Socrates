@@ -91,7 +91,7 @@ Token Lexer::next(){
 
     //Check for variables and special constants.
     if(isalpha(currentCharacter)){
-        result.type = LiteralType::Variable;
+        result.type = LiteralType::LiteralVariable;
 
         //Check for all the alphanumeric characters.
         while(isalnum(currentCharacter)){

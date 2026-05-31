@@ -12,8 +12,6 @@ class Duo{
 public:
     V1 first;
     V2 second;
-
-    Duo();
 };
 
 class Node{

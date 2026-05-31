@@ -262,7 +262,7 @@ Node* Parser::PPrimitive(){
 
     if(check("e")){
         result = stack->allocate<Primitive>();
-        result->number.type = NumberType::floating;
+        result->number.type = NumberType::constant;
         result->type = NumberType::constant;
         result->number.number.float8[0] = 2.7182818284590452;
 
@@ -271,7 +271,7 @@ Node* Parser::PPrimitive(){
 
     if(check("pi")){
         result = stack->allocate<Primitive>();
-        result->number.type = NumberType::floating;
+        result->number.type = NumberType::constant;
         result->type = NumberType::constant;
         result->number.number.float8[0] = 3.1415926535897932;
 

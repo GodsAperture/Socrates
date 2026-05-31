@@ -12,7 +12,7 @@ Primitive::Primitive(){
 }
 
 void Primitive::print(){
-    switch(type){
+    switch(number.type){
         case NumberType::fixed:
             std::cout << number.number.fixed8[0];
             return;
@@ -42,6 +42,7 @@ void Primitive::print(){
             std::cout << "i";
             return;
         default:
+            std::cout << "Unknown number printed: " << (number.type + 0);
             return;
     }
 }
@@ -53,12 +54,17 @@ bool Primitive::isEnd(){
 Duo<bool, Node*> Primitive::step(StackAllocator* stack){
     Duo<bool, Node*> result;
     Primitive* node = stack->allocate<Primitive>();
-    node->number = evaluate();
+    node->number = number;
 
     result.first = true;
-    result.second = stack->allocate<Primitive>();
+    result.second = node;
 
     return result;
+}
+
+void Primitive::stepPrint(){
+    //Easy reuse of code.
+    print();
 }
 
 Number Primitive::evaluate(){
@@ -89,6 +95,17 @@ Duo<bool, Node*> Imaginary::step(StackAllocator* stack){
     result.second = stack->allocate<Primitive>();
 
     return result;
+}
+
+void Imaginary::stepPrint(){
+    if(coefficient->isEnd()){
+        std::cout << ">> ";
+        coefficient->stepPrint();
+        std::cout << "i <<";
+    } else {
+        coefficient->stepPrint();
+        std::cout << "i";
+    }
 }
 
 Number Imaginary::evaluate(){
@@ -152,6 +169,20 @@ Duo<bool, Node*> Add::step(StackAllocator* stack){
     return result;
 }
 
+void Add::stepPrint(){
+    if(left->isEnd() & right->isEnd()){
+        std::cout << ">> ";
+        left->stepPrint();
+        std::cout << " + ";
+        right->stepPrint();
+        std::cout << " <<";
+    } else {
+        left->stepPrint();
+        std::cout << " + ";
+        right->stepPrint();
+    }
+}
+
 Number Add::evaluate(){
     return left->evaluate() + right->evaluate();
 }
@@ -191,6 +222,20 @@ Duo<bool, Node*> Subtract::step(StackAllocator* stack){
     }
 
     return result;
+}
+
+void Subtract::stepPrint(){
+    if(left->isEnd() & right->isEnd()){
+        std::cout << ">> ";
+        left->stepPrint();
+        std::cout << " - ";
+        right->stepPrint();
+        std::cout << " <<";
+    } else {
+        left->stepPrint();
+        std::cout << " - ";
+        right->stepPrint();
+    }
 }
 
 Number Subtract::evaluate(){
@@ -234,6 +279,20 @@ Duo<bool, Node*> Multiply::step(StackAllocator* stack){
     return result;
 }
 
+void Multiply::stepPrint(){
+    if(left->isEnd() & right->isEnd()){
+        std::cout << ">> ";
+        left->stepPrint();
+        std::cout << " * ";
+        right->stepPrint();
+        std::cout << " <<";
+    } else {
+        left->stepPrint();
+        std::cout << " * ";
+        right->stepPrint();
+    }
+}
+
 Number Multiply::evaluate(){
     return left->evaluate() * right->evaluate();
 }
@@ -273,6 +332,20 @@ Duo<bool, Node*> Divide::step(StackAllocator* stack){
     }
 
     return result;
+}
+
+void Divide::stepPrint(){
+    if(left->isEnd() & right->isEnd()){
+        std::cout << ">> ";
+        left->stepPrint();
+        std::cout << " / ";
+        right->stepPrint();
+        std::cout << " <<";
+    } else {
+        left->stepPrint();
+        std::cout << " / ";
+        right->stepPrint();
+    }
 }
 
 Number Divide::evaluate(){
@@ -316,6 +389,20 @@ Duo<bool, Node*> Exponent::step(StackAllocator* stack){
     return result;
 }
 
+void Exponent::stepPrint(){
+    if(left->isEnd() & right->isEnd()){
+        std::cout << ">> ";
+        left->stepPrint();
+        std::cout << "^";
+        right->stepPrint();
+        std::cout << " <<";
+    } else {
+        left->stepPrint();
+        std::cout << "^";
+        right->stepPrint();
+    }
+}
+
 Number Exponent::evaluate(){
     return left->evaluate() ^ right->evaluate();
 }
@@ -349,6 +436,12 @@ Duo<bool, Node*> Parentheses::step(StackAllocator* stack){
         node->number = evaluate();
         result.second = node;
     } else {
+        if(evaluation.second->isEnd()){
+            Primitive* node = stack->allocate<Primitive>();
+            node->number = evaluate();
+            result.second = node;
+            return result;
+        }
         Parentheses* node = stack->allocate<Parentheses>();
         node->subexpression = evaluation.second;
         result.second = node;
@@ -359,11 +452,11 @@ Duo<bool, Node*> Parentheses::step(StackAllocator* stack){
 
 void Parentheses::stepPrint(){
     if(subexpression->isEnd()){
-        std::cout << ">> ";
         subexpression->stepPrint();
-        std::cout << " <<";
     } else {
-        left->stepPrint();
+        std::cout << "(";
+        subexpression->stepPrint();
+        std::cout << ")";
     }
 }
 
@@ -407,13 +500,13 @@ Duo<bool, Node*> Negative::step(StackAllocator* stack){
     return result;
 }
 
-void Factorial::stepPrint(){
-    if(left->isEnd()){
+void Negative::stepPrint(){
+    if(subexpression->isEnd()){
         std::cout << ">> ";
-        left->stepPrint();
+        subexpression->stepPrint();
         std::cout << " <<";
     } else {
-        left->stepPrint();
+        subexpression->stepPrint();
     }
 }
 
