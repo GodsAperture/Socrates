@@ -244,6 +244,7 @@ Node* Parser::PPrimitive(){
 
     if(given[current].type == LiteralType::Fixed){
         result = stack->allocate<Primitive>();
+        result->type = NumberType::fixed;
         result->number.type = NumberType::fixed;
         result->number.number.fixed8[0] = std::stoll(std::string(given[current].name));
         current++;
@@ -253,6 +254,7 @@ Node* Parser::PPrimitive(){
 
     if(given[current].type == LiteralType::Floating){
         result = stack->allocate<Primitive>();
+        result->type = NumberType::floating;
         result->number.type = NumberType::floating;
         result->number.number.float8[0] = std::stod(std::string(given[current].name));
         current++;
@@ -262,8 +264,8 @@ Node* Parser::PPrimitive(){
 
     if(check("e")){
         result = stack->allocate<Primitive>();
-        result->number.type = NumberType::constant;
-        result->type = NumberType::constant;
+        result->number.type = NumberType::floating;
+        result->type = NumberType::floating;
         result->number.number.float8[0] = 2.7182818284590452;
 
         return result;
@@ -271,8 +273,8 @@ Node* Parser::PPrimitive(){
 
     if(check("pi")){
         result = stack->allocate<Primitive>();
-        result->number.type = NumberType::constant;
-        result->type = NumberType::constant;
+        result->number.type = NumberType::floating;
+        result->type = NumberType::floating;
         result->number.number.float8[0] = 3.1415926535897932;
 
         return result;
@@ -281,7 +283,7 @@ Node* Parser::PPrimitive(){
     if(check("i")){
         result= stack->allocate<Primitive>();
         result->number.type = NumberType::complex;
-        result->type = NumberType::constant;
+        result->type = NumberType::complex;
         result->number.number.float8[0] = 0.0;
         result->number.number.float8[1] = 1.0;
 

@@ -12,7 +12,7 @@ Primitive::Primitive(){
 }
 
 void Primitive::print(){
-    switch(number.type){
+    switch(type){
         case NumberType::fixed:
             std::cout << number.number.fixed8[0];
             return;
@@ -20,6 +20,14 @@ void Primitive::print(){
             std::cout << number.number.fixed8[0] << "/" << number.number.fixed8[1];
             return;
         case NumberType::floating:
+            if(number.number.float8[0] == 3.1415926535897932){
+                std::cout << "pi";
+                return;
+            }
+            if(number.number.float8[0] == 2.7182818284590452){
+                std::cout << "e";
+                return;
+            }
             std::cout << number.number.float8[0];
             return;
         case NumberType::complex:
@@ -55,6 +63,7 @@ Duo<bool, Node*> Primitive::step(StackAllocator* stack){
     Duo<bool, Node*> result;
     Primitive* node = stack->allocate<Primitive>();
     node->number = number;
+    node->type = number.type;
 
     result.first = true;
     result.second = node;
@@ -158,6 +167,7 @@ Duo<bool, Node*> Add::step(StackAllocator* stack){
     if(leftEvaluation.first & rightEvaluation.first){
         Primitive* node = stack->allocate<Primitive>();
         node->number = evaluate();
+        node->type = node->number.type;
         result.second = node;
     } else {
         Add* node = stack->allocate<Add>();
@@ -213,6 +223,7 @@ Duo<bool, Node*> Subtract::step(StackAllocator* stack){
     if(leftEvaluation.first & rightEvaluation.first){
         Primitive* node = stack->allocate<Primitive>();
         node->number = evaluate();
+        node->type = node->number.type;
         result.second = node;
     } else {
         Subtract* node = stack->allocate<Subtract>();
@@ -268,6 +279,7 @@ Duo<bool, Node*> Multiply::step(StackAllocator* stack){
     if(leftEvaluation.first & rightEvaluation.first){
         Primitive* node = stack->allocate<Primitive>();
         node->number = evaluate();
+        node->type = node->number.type;
         result.second = node;
     } else {
         Multiply* node = stack->allocate<Multiply>();
@@ -323,6 +335,7 @@ Duo<bool, Node*> Divide::step(StackAllocator* stack){
     if(leftEvaluation.first & rightEvaluation.first){
         Primitive* node = stack->allocate<Primitive>();
         node->number = evaluate();
+        node->type = node->number.type;
         result.second = node;
     } else {
         Divide* node = stack->allocate<Divide>();
@@ -378,6 +391,7 @@ Duo<bool, Node*> Exponent::step(StackAllocator* stack){
     if(leftEvaluation.first & rightEvaluation.first){
         Primitive* node = stack->allocate<Primitive>();
         node->number = evaluate();
+        node->type = node->number.type;
         result.second = node;
     } else {
         Exponent* node = stack->allocate<Exponent>();
@@ -434,11 +448,13 @@ Duo<bool, Node*> Parentheses::step(StackAllocator* stack){
     if(evaluation.first){
         Primitive* node = stack->allocate<Primitive>();
         node->number = evaluate();
+        node->type = node->number.type;
         result.second = node;
     } else {
         if(evaluation.second->isEnd()){
             Primitive* node = stack->allocate<Primitive>();
             node->number = evaluate();
+            node->type = node->number.type;
             result.second = node;
             return result;
         }
@@ -490,6 +506,7 @@ Duo<bool, Node*> Negative::step(StackAllocator* stack){
     if(evaluation.first){
         Primitive* node = stack->allocate<Primitive>();
         node->number = evaluate();
+        node->type = node->number.type;
         result.second = node;
     } else {
         Factorial* node = stack->allocate<Factorial>();
@@ -539,6 +556,7 @@ Duo<bool, Node*> Factorial::step(StackAllocator* stack){
     if(evaluation.first){
         Primitive* node = stack->allocate<Primitive>();
         node->number = evaluate();
+        node->type = node->number.type;
         result.second = node;
     } else {
         Factorial* node = stack->allocate<Factorial>();
@@ -591,6 +609,7 @@ Duo<bool, Node*> AbsoluteValue::step(StackAllocator* stack){
     if(evaluation.first){
         Primitive* node = stack->allocate<Primitive>();
         node->number = evaluate();
+        node->type = node->number.type;
         result.second = node;
     } else {
         AbsoluteValue* node = stack->allocate<AbsoluteValue>();
@@ -661,6 +680,7 @@ Duo<bool, Node*> Variable::step(StackAllocator* stack){
     Duo<bool, Node*> result;
     Primitive* node = stack->allocate<Primitive>();
     node->number = evaluate();
+    node->type = node->number.type;
 
     result.first = true;
     result.second = node;
